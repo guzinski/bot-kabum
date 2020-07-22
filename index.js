@@ -22,7 +22,8 @@ async function verifyNews() {
       occurencies.push(row);
       await sendTelegram(`O que? ${row.occurrence} \n Onde? ${row.branch} \n Quando? ${row.timeDate}`);
     });
-    sendTelegram("Nada Ainda");
+  sendTelegram('Nada Ainda');
+  console.log('Aline')
   setTimeout(verifyNews, 600000);
 }
 verifyNews();
