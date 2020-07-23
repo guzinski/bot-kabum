@@ -1,6 +1,18 @@
 const axios = require('axios').default;
+const redis = require('redis');
 
 let occurencies = [];
+
+const client = redis.createClient({
+  url: process.env.REDIS_URL
+})
+
+
+client.get("tracking", function(error, reply) {
+  occurencies = JSON.parse(reply);
+  verifyNews();
+});
+
 
 async function getData() {
   return axios.get('https://radar.tntbrasil.com.br/radar/public/localizacaoSimplificadaDetail/sJPtS557dHDHihyvaWiiYw')
@@ -22,10 +34,10 @@ async function verifyNews() {
       occurencies.push(row);
       await sendTelegram(`O que? ${row.occurrence} \n Onde? ${row.branch} \n Quando? ${row.timeDate}`);
     });
+    client.set("tracking", JSON.stringify(occurencies));
   console.log('Nada Ainda')
   setTimeout(verifyNews, 600000);
 }
-verifyNews();
 
 async function sendTelegram(text) {
   await axios.post('https://api.telegram.org/bot1288327201:AAGfEGaWW1ZFKOSmpKr_eKgC-reUKgIvzVM/sendMessage', {
